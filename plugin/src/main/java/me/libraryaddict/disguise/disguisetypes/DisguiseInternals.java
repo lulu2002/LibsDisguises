@@ -320,4 +320,9 @@ public class DisguiseInternals<D extends Disguise> implements DisguiseScaling.Di
     public double getDisguiseScale() {
         return getDisguise().getDisguiseScale();
     }
+
+    @Override
+    public Double getSelfViewScale() {
+        return getDisguise().getSelfViewScale();
+    }
 }
