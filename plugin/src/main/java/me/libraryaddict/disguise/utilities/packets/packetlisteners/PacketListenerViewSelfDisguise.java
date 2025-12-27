@@ -146,8 +146,9 @@ public class PacketListenerViewSelfDisguise extends SimplePacketListenerAbstract
                     DisguiseUtilities.writeSelfDisguiseId(observer.getEntityId(), newPacket);
                 }
 
-                // Ensure that the self disguise is always underscaled
-                if (newPacket.getPacketTypeData().getPacketType() == Server.UPDATE_ATTRIBUTES && disguise.isTallSelfDisguisesScaling()) {
+                // Ensure that the self disguise scale is correct (either user-defined or auto-calculated)
+                if (newPacket.getPacketTypeData().getPacketType() == Server.UPDATE_ATTRIBUTES &&
+                    (disguise.getSelfViewScale() != null || disguise.isTallSelfDisguisesScaling())) {
                     runAttributes(disguise, newPacket);
                 }
 
@@ -214,6 +215,16 @@ public class PacketListenerViewSelfDisguise extends SimplePacketListenerAbstract
             // Only modify scale attribute
             if (prop.getAttribute() != Attributes.GENERIC_SCALE) {
                 continue;
+            }
+
+            // Check if user has set a custom self view scale
+            Double selfViewScale = disguise.getSelfViewScale();
+
+            if (selfViewScale != null) {
+                // Use the user-defined self view scale
+                toSend.remove(prop);
+                toSend.add(new WrapperPlayServerUpdateAttributes.Property(Attributes.GENERIC_SCALE, selfViewScale, new ArrayList<>()));
+                break;
             }
 
             double playerValue = prop.calcValue();

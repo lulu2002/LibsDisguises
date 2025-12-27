@@ -58,6 +58,15 @@ public class PacketHandlerAttributes implements IPacketHandler<WrapperPlayServer
                 if (entity == observer) {
                     // Trigger a refresh incase the attribute had changed
                     disguise.getInternals().getPacketEntityScale(property.calcValue());
+
+                    // Check if user has set a custom self view scale
+                    Double selfViewScale = disguise.getSelfViewScale();
+
+                    if (selfViewScale != null) {
+                        // Use the user-defined self view scale
+                        attributes.add(new WrapperPlayServerUpdateAttributes.Property(Attributes.GENERIC_SCALE, selfViewScale, new ArrayList<>()));
+                        continue;
+                    }
                 }
 
                 // If the scale was hard set, use that
