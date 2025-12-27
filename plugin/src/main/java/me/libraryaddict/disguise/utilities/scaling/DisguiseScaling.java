@@ -52,6 +52,11 @@ public class DisguiseScaling {
         double getPrevSelfDisguiseTallScaleMax();
 
         void setSelfDisguiseTallScaleMax(double newMax);
+
+        /**
+         * Returns the user-defined self view scale, or null if automatic calculation should be used
+         */
+        Double getSelfViewScale();
     }
 
     @Getter
@@ -99,8 +104,14 @@ public class DisguiseScaling {
             return;
         }
 
-        // If scale has been changed
-        if (prevTinyFigureScaleMax != newTinyFigureScaleMax) {
+        // Check if user has set a custom self view scale
+        Double userSelfViewScale = getScalingInternals().getSelfViewScale();
+
+        if (userSelfViewScale != null) {
+            // User has set a custom scale, always use it
+            getScalingInternals().sendTinyFigureScale(userSelfViewScale);
+        } else if (prevTinyFigureScaleMax != newTinyFigureScaleMax) {
+            // If scale has been changed and no custom scale is set
             // If tiny figure can be scaled
             if (getScalingInternals().isTinyFigureScaleable()) {
                 getScalingInternals().sendTinyFigureScale(newTinyFigureScaleMax);

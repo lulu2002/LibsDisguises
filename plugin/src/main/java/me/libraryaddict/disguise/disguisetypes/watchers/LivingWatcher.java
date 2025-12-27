@@ -114,8 +114,21 @@ public class LivingWatcher extends FlagWatcher {
 
     private @NotNull WrapperPlayServerUpdateAttributes getWrapperPlayServerUpdateAttributes(Player player, Entity entity,
                                                                                             double scaleToSend) {
-        double toSend = player == entity && getDisguise().isTallSelfDisguisesScaling() ?
-            Math.min(getDisguise().getInternals().getPrevSelfDisguiseTallScaleMax(), scaleToSend) : scaleToSend;
+        double toSend = scaleToSend;
+
+        // If sending to self
+        if (player == entity) {
+            // Check if user has set a custom self view scale
+            Double selfViewScale = getDisguise().getSelfViewScale();
+
+            if (selfViewScale != null) {
+                // Use the user-defined self view scale
+                toSend = selfViewScale;
+            } else if (getDisguise().isTallSelfDisguisesScaling()) {
+                // Use automatic calculation
+                toSend = Math.min(getDisguise().getInternals().getPrevSelfDisguiseTallScaleMax(), scaleToSend);
+            }
+        }
 
         WrapperPlayServerUpdateAttributes.Property property =
             new WrapperPlayServerUpdateAttributes.Property(Attributes.GENERIC_SCALE, toSend, new ArrayList<>());
