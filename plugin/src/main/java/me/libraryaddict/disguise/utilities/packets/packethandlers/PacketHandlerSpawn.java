@@ -333,12 +333,20 @@ public class PacketHandlerSpawn implements IPacketHandler {
                 Double scale = ((LivingWatcher) disguise.getWatcher()).getScale();
 
                 if (observer == disguisedEntity) {
-                    if (scale == null) {
-                        scale = DisguiseUtilities.getEntityScaleWithoutLibsDisguises(observer);
-                    }
+                    // Check if user has set a custom self view scale
+                    Double selfViewScale = disguise.getSelfViewScale();
 
-                    if (disguise.isTallSelfDisguisesScaling()) {
-                        scale = Math.min(disguise.getInternals().getSelfDisguiseTallScaleMax(), scale);
+                    if (selfViewScale != null) {
+                        // Use the user-defined self view scale
+                        scale = selfViewScale;
+                    } else {
+                        if (scale == null) {
+                            scale = DisguiseUtilities.getEntityScaleWithoutLibsDisguises(observer);
+                        }
+
+                        if (disguise.isTallSelfDisguisesScaling()) {
+                            scale = Math.min(disguise.getInternals().getSelfDisguiseTallScaleMax(), scale);
+                        }
                     }
 
                     attributes.add(new WrapperPlayServerUpdateAttributes.Property(Attributes.GENERIC_SCALE, scale, new ArrayList<>()));
