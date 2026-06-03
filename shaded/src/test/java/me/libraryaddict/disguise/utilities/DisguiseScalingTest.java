@@ -56,6 +56,11 @@ public class DisguiseScalingTest {
             return getUnscaledHeight() >= DisguiseScaling.getTallDisguiseAtHeight();
         }
 
+        @Override
+        public Double getSelfViewScale() {
+            return null;
+        }
+
         DisguiseScalingImpl withPlayerScaling(boolean playerScaling) {
             scalePlayerToDisguise = playerScaling;
 
