@@ -149,6 +149,13 @@ public abstract class Disguise {
      */
     @Getter
     private boolean scalePlayerToDisguise = DisguiseConfig.isScaleSelfDisguises();
+    /**
+     * The scale that the disguised player sees their own disguise at.
+     * If null, the automatic scaling calculation is used.
+     * This only affects the self-view, other players will see the normal scale.
+     */
+    @Getter
+    private Double selfViewScale;
     @Getter
     @ApiStatus.Internal
     private final DisguiseInternals internals;
@@ -180,6 +187,7 @@ public abstract class Disguise {
         disguise.bossBarStyle = getBossBarStyle();
         disguise.setExpires(getExpires());
         disguise.setScalePlayerToDisguise(isScalePlayerToDisguise());
+        disguise.setSelfViewScale(getSelfViewScale());
         disguise.setHidePlayer(isHidePlayer());
         disguise.setKeepDisguiseOnPlayerDeath(isKeepDisguiseOnPlayerDeath());
         disguise.setMobsIgnoreDisguise(isMobsIgnoreDisguise());
@@ -600,6 +608,32 @@ public abstract class Disguise {
     public void setScalePlayerToDisguise(boolean scalePlayerToDisguise) {
         this.scalePlayerToDisguise = scalePlayerToDisguise;
         adjustTallSelfDisguiseScale();
+    }
+
+    /**
+     * Sets the scale that the disguised player sees their own disguise at.
+     * This only affects self-view - other players will see the normal scale from {@link me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher#setScale(Double)}.
+     *
+     * @param selfViewScale The scale for self-view, or null to use automatic calculation
+     */
+    public void setSelfViewScale(Double selfViewScale) {
+        if (selfViewScale != null && selfViewScale < 0) {
+            selfViewScale = 0D;
+        }
+
+        this.selfViewScale = selfViewScale;
+
+        if (!NmsVersion.v1_20_R4.isSupported() || !isDisguiseInUse() || !(getEntity() instanceof Player)) {
+            return;
+        }
+
+        // Send the updated scale to the player
+        if (selfViewScale != null) {
+            getInternals().sendTinyFigureScale(selfViewScale);
+        } else {
+            // If set to null, recalculate and send the automatic scale
+            adjustTallSelfDisguiseScale();
+        }
     }
 
     protected void adjustTallSelfDisguiseScale() {
